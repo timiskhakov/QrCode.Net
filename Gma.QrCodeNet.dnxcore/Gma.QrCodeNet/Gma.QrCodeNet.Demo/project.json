@@ -5,12 +5,12 @@
   },
 
   "dependencies": {
-    "Gma.QrCodeNet.Encoding": "1.0.0-*",
+    "CoreCompat.System.Drawing": "1.0.0-beta006",
+    "Gma.QrCodeNet.Encoding": "1.0.1",
     "Microsoft.NETCore.App": {
-        "type": "platform",
-        "version": "1.0.1"
-    },
-    "ZKWeb.System.Drawing": "1.0.1"
+      "type": "platform",
+      "version": "1.0.1"
+    }
   },
 
   "frameworks": {
