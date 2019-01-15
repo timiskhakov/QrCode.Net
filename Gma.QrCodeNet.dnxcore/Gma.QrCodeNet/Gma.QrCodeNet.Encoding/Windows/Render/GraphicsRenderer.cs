@@ -140,6 +140,54 @@ namespace Gma.QrCodeNet.Encoding.Windows.Render
             }
         }
 
+        /// <summary>
+        /// Saves QrCode Image to specified stream in the specified format in the parallel safe mode
+        /// </summary>
+        /// <param name="qrMatrix"></param>
+        /// <param name="imageFormat"></param>
+        /// <param name="stream"></param>
+        /// <remarks>You should avoid saving an image to the same stream that was used to construct. Doing so might damage the stream. If any additional data has been written to the stream before saving the image, the image data in the stream will be corrupted</remarks>
+        public void WriteToStreamParallelSafe(BitMatrix qrMatrix, ImageFormat imageFormat, Stream stream)
+        {
+            if (qrMatrix == null ||
+                imageFormat == ImageFormat.Exif ||
+                imageFormat == ImageFormat.Icon ||
+                imageFormat == ImageFormat.MemoryBmp)
+            {
+                return;
+            }
+
+            int size = m_iSize
+                .GetSize(qrMatrix.Width)
+                .CodeWidth;
+
+            // Assuming that size > qrMatrix.Width is always true
+            var quality = size / qrMatrix.Width + 1;
+            using (var bitmap = new Bitmap(qrMatrix.Width * quality, qrMatrix.Width * quality))
+            {
+                // First get a better quality image
+                for (var i = 0; i < qrMatrix.Width; i++)
+                for (var j = 0; j < qrMatrix.Width; j++)
+                {
+                    var color = qrMatrix[i, j]
+                        ? Color.Black
+                        : Color.White;
+                    for (var x = 0; x < quality; x++)
+                    for (var y = 0; y < quality; y++)
+                    {
+                        bitmap.SetPixel(i * quality + x, j * quality + y, color);
+                    }
+                }
+
+                // Then scale it down to the given size to save as a memory stream
+                float scale = (float)size / bitmap.Width;
+                using (var resized = new Bitmap(bitmap, new Size(
+                    (int)(bitmap.Width * scale),
+                    (int)(bitmap.Height * scale))))
+                resized.Save(stream, imageFormat);
+            }
+        }
+
         /*
         /// <summary>
         /// Using MetaFile Class to create metafile. 
@@ -163,9 +211,9 @@ namespace Gma.QrCodeNet.Encoding.Windows.Render
 
         */
 
-        /// <summary>
-        /// DarkBrush for drawing Dark module of QrCode
-        /// </summary>
+            /// <summary>
+            /// DarkBrush for drawing Dark module of QrCode
+            /// </summary>
         public Brush DarkBrush
         {
             set
