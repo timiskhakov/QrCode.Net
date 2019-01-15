@@ -140,6 +140,13 @@ namespace Gma.QrCodeNet.Encoding.Windows.Render
             }
         }
 
+        /// <summary>
+        /// Saves QrCode Image to specified stream in the specified format in the parallel safe mode
+        /// </summary>
+        /// <param name="qrMatrix"></param>
+        /// <param name="imageFormat"></param>
+        /// <param name="stream"></param>
+        /// <remarks>You should avoid saving an image to the same stream that was used to construct. Doing so might damage the stream. If any additional data has been written to the stream before saving the image, the image data in the stream will be corrupted</remarks>
         public void WriteToStreamParallelSafe(BitMatrix qrMatrix, ImageFormat imageFormat, Stream stream)
         {
             if (qrMatrix == null ||
