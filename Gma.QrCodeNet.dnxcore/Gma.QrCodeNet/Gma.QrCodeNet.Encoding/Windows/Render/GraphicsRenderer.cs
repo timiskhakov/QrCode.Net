@@ -146,16 +146,16 @@ namespace Gma.QrCodeNet.Encoding.Windows.Render
         /// <param name="qrMatrix"></param>
         /// <param name="imageFormat"></param>
         /// <param name="stream"></param>
+        /// <exception cref="ArgumentNullException">Throws when <paramref name="qrMatrix"/> is null</exception>
+        /// <exception cref="ArgumentException">Throws when <paramref name="imageFormat"/> is Exif, Icon, or MemoryBmp</exception>
         /// <remarks>You should avoid saving an image to the same stream that was used to construct. Doing so might damage the stream. If any additional data has been written to the stream before saving the image, the image data in the stream will be corrupted</remarks>
         public void WriteToStreamParallelSafe(BitMatrix qrMatrix, ImageFormat imageFormat, Stream stream)
         {
-            if (qrMatrix == null ||
-                imageFormat == ImageFormat.Exif ||
+            if (qrMatrix == null) throw new ArgumentNullException(nameof(qrMatrix));
+            if (imageFormat == ImageFormat.Exif ||
                 imageFormat == ImageFormat.Icon ||
                 imageFormat == ImageFormat.MemoryBmp)
-            {
-                return;
-            }
+                throw new ArgumentException($"Unsupported {imageFormat}");
 
             DrawingSize size = m_iSize.GetSize(qrMatrix.Width);
             int width = size.CodeWidth;
