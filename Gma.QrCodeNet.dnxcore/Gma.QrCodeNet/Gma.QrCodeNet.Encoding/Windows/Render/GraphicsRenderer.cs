@@ -157,15 +157,16 @@ namespace Gma.QrCodeNet.Encoding.Windows.Render
                 return;
             }
 
-            int size = m_iSize
-                .GetSize(qrMatrix.Width)
-                .CodeWidth;
+            DrawingSize size = m_iSize.GetSize(qrMatrix.Width);
+            int width = size.CodeWidth;
+            int border = 10; // size.ModuleSize * 2 ?
 
             // Assuming that size > qrMatrix.Width is always true
-            var quality = size / qrMatrix.Width + 1;
-            using (var bitmap = new Bitmap(qrMatrix.Width * quality, qrMatrix.Width * quality))
+            var quality = width / qrMatrix.Width;
+            using (var bitmap = new Bitmap(
+                qrMatrix.Width * quality + 2 * border,
+                qrMatrix.Width * quality + 2 * border))
             {
-                // First get a better quality image
                 for (var i = 0; i < qrMatrix.Width; i++)
                 for (var j = 0; j < qrMatrix.Width; j++)
                 {
@@ -175,16 +176,14 @@ namespace Gma.QrCodeNet.Encoding.Windows.Render
                     for (var x = 0; x < quality; x++)
                     for (var y = 0; y < quality; y++)
                     {
-                        bitmap.SetPixel(i * quality + x, j * quality + y, color);
+                        bitmap.SetPixel(
+                            border + i * quality + x,
+                            border + j * quality + y,
+                            color);
                     }
                 }
 
-                // Then scale it down to the given size to save as a memory stream
-                float scale = (float)size / bitmap.Width;
-                using (var resized = new Bitmap(bitmap, new Size(
-                    (int)(bitmap.Width * scale),
-                    (int)(bitmap.Height * scale))))
-                resized.Save(stream, imageFormat);
+                bitmap.Save(stream, imageFormat);
             }
         }
 
